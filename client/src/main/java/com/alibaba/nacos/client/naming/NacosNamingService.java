@@ -92,6 +92,7 @@ public class NacosNamingService implements NamingService {
         initLogName(properties);
     
         this.notifierEventScope = UUID.randomUUID().toString();
+        // 实例变更通知
         this.changeNotifier = new InstancesChangeNotifier(this.notifierEventScope);
         NotifyCenter.registerToPublisher(InstancesChangeEvent.class, 16384);
         NotifyCenter.registerSubscriber(changeNotifier);

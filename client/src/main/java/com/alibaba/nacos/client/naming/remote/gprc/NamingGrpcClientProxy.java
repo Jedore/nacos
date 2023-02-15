@@ -187,6 +187,7 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     @Override
     public ServiceInfo queryInstancesOfService(String serviceName, String groupName, String clusters, int udpPort,
             boolean healthyOnly) throws NacosException {
+        // 查询指定服务下的实例列表
         ServiceQueryRequest request = new ServiceQueryRequest(namespaceId, serviceName, groupName);
         request.setCluster(clusters);
         request.setHealthyOnly(healthyOnly);
