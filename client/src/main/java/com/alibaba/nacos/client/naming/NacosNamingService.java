@@ -233,14 +233,20 @@ public class NacosNamingService implements NamingService {
     @Override
     public List<Instance> getAllInstances(String serviceName, String groupName, List<String> clusters,
             boolean subscribe) throws NacosException {
+        // 获取所有实例
         ServiceInfo serviceInfo;
         String clusterString = StringUtils.join(clusters, ",");
         if (subscribe) {
+            // 订阅模式
+            // 缓存获取
             serviceInfo = serviceInfoHolder.getServiceInfo(serviceName, groupName, clusterString);
             if (null == serviceInfo || !clientProxy.isSubscribed(serviceName, groupName, clusterString)) {
+                // 未缓存或未订阅
                 serviceInfo = clientProxy.subscribe(serviceName, groupName, clusterString);
             }
         } else {
+            // 非订阅模式
+            // 直接查询
             serviceInfo = clientProxy.queryInstancesOfService(serviceName, groupName, clusterString, 0, false);
         }
         List<Instance> list;
@@ -397,10 +403,12 @@ public class NacosNamingService implements NamingService {
     @Override
     public void subscribe(String serviceName, String groupName, List<String> clusters, EventListener listener)
             throws NacosException {
+        // 订阅
         if (null == listener) {
             return;
         }
         String clusterString = StringUtils.join(clusters, ",");
+        // 注册监听事件
         changeNotifier.registerListener(groupName, serviceName, clusterString, listener);
         clientProxy.subscribe(serviceName, groupName, clusterString);
     }

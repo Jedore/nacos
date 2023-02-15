@@ -108,6 +108,7 @@ public class InstancesChangeNotifier extends Subscriber<InstancesChangeEvent> {
      * @return is serviceName,clusters subscribed
      */
     public boolean isSubscribed(String groupName, String serviceName, String clusters) {
+        // 判断服务是否订阅过
         String key = ServiceInfo.getKey(NamingUtils.getGroupedName(serviceName, groupName), clusters);
         ConcurrentHashSet<EventListener> eventListeners = listenerMap.get(key);
         return CollectionUtils.isNotEmpty(eventListeners);

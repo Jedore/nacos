@@ -96,6 +96,7 @@ public class NamingEventPublisher extends Thread implements ShardedEventPublishe
     
     @Override
     public boolean publish(Event event) {
+        // 发布事件
         checkIsStart();
         boolean success = this.queue.offer(event);
         if (!success) {

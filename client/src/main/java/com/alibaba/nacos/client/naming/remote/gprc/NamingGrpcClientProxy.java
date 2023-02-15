@@ -82,10 +82,13 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
         super(securityProxy);
         this.namespaceId = namespaceId;
         this.uuid = UUID.randomUUID().toString();
+        // 设置超时时间
         this.requestTimeout = Long.parseLong(properties.getProperty(CommonParams.NAMING_REQUEST_TIMEOUT, "-1"));
         Map<String, String> labels = new HashMap<>();
+        // 设置label数据
         labels.put(RemoteConstants.LABEL_SOURCE, RemoteConstants.LABEL_SOURCE_SDK);
         labels.put(RemoteConstants.LABEL_MODULE, RemoteConstants.LABEL_MODULE_NAMING);
+        // 创建 grpc client
         this.rpcClient = RpcClientFactory.createClient(uuid, ConnectionType.GRPC, labels);
         this.redoService = new NamingGrpcRedoService(this);
         start(serverListFactory, serviceInfoHolder);
@@ -93,8 +96,11 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     
     private void start(ServerListFactory serverListFactory, ServiceInfoHolder serviceInfoHolder) throws NacosException {
         rpcClient.serverListFactory(serverListFactory);
+        // 注册 connection 建立、断开 事件响应
         rpcClient.registerConnectionListener(redoService);
+        // 注册 Nacos server Push 请求处理函数
         rpcClient.registerServerRequestHandler(new NamingPushRequestHandler(serviceInfoHolder));
+        // 启动 grpc client
         rpcClient.start();
         NotifyCenter.registerSubscriber(this);
     }
@@ -238,6 +244,7 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
             NAMING_LOGGER.debug("[GRPC-SUBSCRIBE] service:{}, group:{}, cluster:{} ", serviceName, groupName, clusters);
         }
         redoService.cacheSubscriberForRedo(serviceName, groupName, clusters);
+        // 订阅
         return doSubscribe(serviceName, groupName, clusters);
     }
     
@@ -251,6 +258,7 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
      * @throws NacosException nacos exception
      */
     public ServiceInfo doSubscribe(String serviceName, String groupName, String clusters) throws NacosException {
+        // 订阅
         SubscribeServiceRequest request = new SubscribeServiceRequest(namespaceId, groupName, serviceName, clusters,
                 true);
         SubscribeServiceResponse response = requestToServer(request, SubscribeServiceResponse.class);
